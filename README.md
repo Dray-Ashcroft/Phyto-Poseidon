@@ -1,41 +1,40 @@
-# Hydrotropism Simulator 💧
+💧 Phyto-Poseidon
 
 <p align="center">
-  <img src="assets/repo-banner.png" alt="Hydrotropism Simulator Banner" width="100%">
-</p>
+  <img src="assets/repo-banner.png" alt="Phyto-Poseidon Banner" width="100%">
+</p>Interactive Hydrotropism Simulator
 
-A clean, interactive educational web simulation modeling plant root hydrotropism. Explore how plant roots perceive and bend toward moisture gradients, balancing hydrotropic response against other environmental directional cues.
+«An educational simulation exploring plant root hydrotropism through moisture gradients, directional root growth, and interactions between environmental cues.»
 
----
-
-## ✨ Features
-
-* **Moisture Gradient:** Simulate distinct moist and dry soil compartments to observe directional root bending toward water sources.
-* **Interactive Controls:** Adjust moisture levels and simulation parameters in real time.
-* **Growth Visualization:** Watch root curvature develop progressively as hydrotropic signals override standard vertical growth paths.
-* **Reset Functionality:** Instantly reset the simulation to test different soil moisture hypotheses.
+💧 Plant Physiology · 🌱 Hydrotropism · 🌊 Water Gradient
 
 ---
 
-## 🚀 Built With & Hosted On
+✦ Features
 
-* **Repository:** GitHub
-* **Hosting:** GitHub Pages
-  
----
+💧 Moisture Gradient
+Simulate moist and dry soil conditions to observe directional root growth toward water.
 
-## 🛠️ Credits & Acknowledgments
+⚙️ Interactive Controls
+Adjust moisture levels and simulation parameters in real time.
 
-* **Claude Sonnet:** Debugging, Code Generation & Architecture
-* **Replit:** Code Improvisation & Rapid Prototyping
-* **OpenAI:** Bug Fixes & Logic Optimization
+🌱 Growth Visualization
+Observe root curvature develop progressively in response to moisture gradients.
 
----
-
-## 👤 Author
-
-* **Draven Ashcroft**
-  * M.Sc. Ag. Entomology, ASRB NET
-  * DIPS Chain Of Institutions
+↻ Reset Functionality
+Reset the simulation to investigate different moisture conditions and growth responses.
 
 ---
+
+⚙️ Technology
+
+HTML · CSS · JavaScript
+
+Source: GitHub
+Hosting: GitHub Pages
+
+---
+
+📜 License
+
+GNU General Public License v3.0 (GPL-3.0)
