@@ -1,40 +1,50 @@
-💧 Phyto-Poseidon
-
 <p align="center">
-  <img src="assets/repo-banner.png" alt="Phyto-Poseidon Banner" width="100%">
-</p>Interactive Hydrotropism Simulator
+  <img src="assets/banner.png" alt="Phyto-Poseidon — Interactive Hydrotropism Simulator" width="100%">
+</p>
 
-«An educational simulation exploring plant root hydrotropism through moisture gradients, directional root growth, and interactions between environmental cues.»
+# 💧 Phyto-Poseidon
 
-💧 Plant Physiology · 🌱 Hydrotropism · 🌊 Water Gradient
+### *Interactive Hydrotropism Simulator*
+
+> **Phyto-Poseidon** is an interactive visualization exploring **root hydrotropism, moisture gradients, directional root growth, and environmental responses**.
+>
+💧 **Plant Physiology** · 🌱 **Hydrotropism** · 🌊 **Water Gradient**
+
+**🔬 [Explore the Simulation](YOUR-LINK-HERE)**
 
 ---
 
-✦ Features
+## ✦ Features
 
-💧 Moisture Gradient
+**💧 Moisture Gradient**  
 Simulate moist and dry soil conditions to observe directional root growth toward water.
 
-⚙️ Interactive Controls
+**⚙️ Interactive Controls**  
 Adjust moisture levels and simulation parameters in real time.
 
-🌱 Growth Visualization
-Observe root curvature develop progressively in response to moisture gradients.
+**🌱 Growth Visualization**  
+Observe progressive root curvature in response to moisture gradients.
 
-↻ Reset Functionality
-Reset the simulation to investigate different moisture conditions and growth responses.
-
----
-
-⚙️ Technology
-
-HTML · CSS · JavaScript
-
-Source: GitHub
-Hosting: GitHub Pages
+**↻ Reset Functionality**  
+Reset the simulation to explore different moisture conditions and growth responses.
 
 ---
 
-📜 License
+## 🧬 Core Concepts
 
-GNU General Public License v3.0 (GPL-3.0)
+**Hydrotropism · Moisture Gradient · Root Growth · Directional Growth · Environmental Stimuli · Plant Physiology**
+
+---
+
+## ⚙️ Technology
+
+**HTML · CSS · JavaScript**
+
+**Repository:** GitHub & Codeberg  
+**Hosting:** Cloudflare
+
+---
+
+## 📜 License
+
+Distributed under the **GNU General Public License v3.0 (GPL-3.0)**.
