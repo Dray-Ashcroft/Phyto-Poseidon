@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phyto Poseidon — Hydrotropism Simulation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div class="wrap">
+  <header class="app-header">
+    <div class="app-icon-wrap" aria-hidden="true">
+      <svg viewBox="0 0 44 44" style="width:46px;height:46px;">
+          <circle cx="22" cy="22" r="20" fill="#06202c"></circle>
+          <path d="M22 9c5.2 6.6 8.4 11.4 8.4 15.6a8.4 8.4 0 0 1-16.8 0C13.6 20.4 16.8 15.6 22 9Z" fill="#5ccbf2"></path>
+          <path d="M18.2 25.4a4 4 0 0 0 3.8 3.7" fill="none" stroke="#06202c" stroke-width="1.8" stroke-linecap="round"></path>
+        </svg>
+    </div>
+    <h1 class="app-title">Phyto Poseidon</h1>
+    <button class="theme-btn" id="themeBtn" title="Switch to light theme" aria-label="Switch to light theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"></path></svg>
+    </button>
+  </header>
+  <p class="subtitle">How a root turns toward water · An interactive hydrotropism lab</p>
+
+  <div class="layout">
+  <div class="main">
+  <div class="panel">
+    <div class="stage" id="stage" tabindex="0" aria-label="3D scene. Use the arrow keys to orbit the camera.">
+      <canvas id="glCanvas" aria-label="3D scene: two plants in transparent pots, one with a water source at the side, divided by a partition"></canvas>
+
+      <svg id="overlay" xmlns="http://www.w3.org/2000/svg">
+        <g id="protractor" style="display:none"></g>
+        <g id="magLayer" style="display:none">
+          <line id="magLeaderLine" stroke="rgba(200,225,180,0.6)" stroke-width="1.5" stroke-dasharray="5 4" stroke-linecap="round" opacity="0"></line>
+          <circle id="magApexDot" r="3.5" fill="none" stroke="rgba(200,225,180,0.85)" stroke-width="1.5" opacity="0"></circle>
+          <circle id="magHit" r="10" fill="transparent"></circle>
+        </g>
+      </svg>
+
+      <div class="tag sun" id="tagWater">Water</div>
+      <div class="tag pot a" id="tagControl"><span class="badge">A</span><span class="tag-text">Control<small>Even moisture</small></span></div>
+      <div class="tag pot b" id="tagExperimental"><span class="badge">B</span><span class="tag-text">Experimental<small id="tagExpSub">Water on the right</small></span></div>
+
+      <div class="call-card" id="callCard" role="status" aria-live="polite">
+        <div class="call-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="10.3" cy="10.3" r="6"></circle><line x1="14.8" y1="14.8" x2="20" y2="20" stroke-linecap="round"></line></svg>
+        </div>
+        <div class="call-text">
+          <p class="call-title" id="callTitle">Magnifier</p>
+          <p class="call-line" id="callLine1"></p>
+          <p class="call-line" id="callLine2"></p>
+        </div>
+      </div>
+
+      <div class="navpad" id="navPad" role="group" aria-label="Camera navigation">
+        <button class="nav up" data-dir="up" aria-label="Orbit up" title="Orbit up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"></path></svg></button>
+        <button class="nav left" data-dir="left" aria-label="Orbit left" title="Orbit left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"></path></svg></button>
+        <button class="nav right" data-dir="right" aria-label="Orbit right" title="Orbit right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></button>
+        <button class="nav down" data-dir="down" aria-label="Orbit down" title="Orbit down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></button>
+      </div>
+
+      <div class="loader" id="loader" role="progressbar" aria-label="Loading 3D scene" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="loader-box">
+          <p id="stageStatus">Loading 3D scene…</p>
+          <div class="loader-bar"><i id="loaderBar"></i></div>
+          <small id="loaderStep">Starting</small>
+        </div>
+      </div>
+      <p class="sr-only" id="sceneSummary" aria-live="polite"></p>
+    </div>
+
+    <div class="toolbar">
+      <button id="magBtn" title="Show magnifier" aria-label="Show magnifier">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10.3" cy="10.3" r="6"></circle><line x1="14.8" y1="14.8" x2="20" y2="20" stroke-linecap="round"></line></svg>
+      </button>
+      <button id="magScaleDownBtn" title="Shrink magnifier" aria-label="Shrink magnifier">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10.3" cy="10.3" r="6"></circle><line x1="14.8" y1="14.8" x2="20" y2="20" stroke-linecap="round"></line><line x1="7.3" y1="10.3" x2="13.3" y2="10.3" stroke-linecap="round"></line></svg>
+      </button>
+      <button id="magScaleUpBtn" title="Enlarge magnifier" aria-label="Enlarge magnifier">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10.3" cy="10.3" r="6"></circle><line x1="14.8" y1="14.8" x2="20" y2="20" stroke-linecap="round"></line><line x1="7.3" y1="10.3" x2="13.3" y2="10.3" stroke-linecap="round"></line><line x1="10.3" y1="7.3" x2="10.3" y2="13.3" stroke-linecap="round"></line></svg>
+      </button>
+      <div class="room-switch" id="roomSwitch" role="radiogroup" aria-label="Focus on a room">
+        <span class="room-thumb" id="roomThumb"></span>
+        <button class="room-opt" role="radio" aria-checked="false" data-room="left" aria-label="Room A" title="Room A"><b>A</b></button>
+        <button class="room-opt" role="radio" aria-checked="false" data-room="right" aria-label="Room B" title="Room B"><b>B</b></button>
+      </div>
+      <button id="protBtn" title="Show protractor" aria-label="Show protractor">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18h18"></path><path d="M4.5 18a7.5 7.5 0 0 1 15 0"></path><path d="M12 18 16.5 9.5"></path><path d="M12 13.5v1M8.2 14.8l.6.6M15.2 15.4l.6-.6"></path></svg>
+      </button>
+      <button id="layoutBtn" title="Reset layout" aria-label="Reset layout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"></rect><path d="M14 17a3.2 3.2 0 1 0 1-2.3"></path><path d="M14 13.6v2h2"></path></svg>
+      </button>
+    </div>
+  </div>
+
+  </div>
+  <div class="side">
+  <div class="toolbar">
+    <button id="playBtn" title="Play" aria-label="Play">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7L8 5Z" fill="currentColor"></path></svg>
+    </button>
+    <button id="resetBtn" title="Reset simulation" aria-label="Reset simulation">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 5V2L7 6l5 4V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8Z" fill="currentColor"></path></svg>
+    </button>
+    <div class="clock" id="timeClock" tabindex="0" role="slider" aria-label="Elapsed time in hours" aria-valuemin="0" aria-valuemax="120" aria-valuenow="0">
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="46" fill="#1a1d24" stroke="rgba(255,255,255,0.14)" stroke-width="1.5"></circle>
+        <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="6"></circle>
+        <circle id="clockArc" cx="50" cy="50" r="38" fill="none" stroke="#5ccbf2" stroke-width="6" stroke-linecap="round"
+                transform="rotate(-90 50 50)" stroke-dasharray="238.76" stroke-dashoffset="238.76"></circle>
+        <g id="clockTicks"></g>
+        <g id="clockHand">
+          <line x1="50" y1="50" x2="50" y2="17" stroke="#fff" stroke-width="2.6" stroke-linecap="round"></line>
+          <circle cx="50" cy="12" r="5.5" fill="#5ccbf2" stroke="#061f2b" stroke-width="1.2"></circle>
+        </g>
+        <circle cx="50" cy="50" r="3.6" fill="#fff"></circle>
+      </svg>
+    </div>
+    <div class="clock-text">
+      <p class="clock-t" id="hoursReadout">t = 0 h</p>
+      <p class="clock-s" id="dayReadout">Day 1 of 5 · drag the hand</p>
+    </div>
+  </div>
+
+  <div class="light-panel water-panel">
+            <div class="pot-hint" id="potHint" hidden>
+              <span>Applies to pot B</span>
+              <button class="pill-go" id="goBBtn" title="Go to pot B" aria-label="Go to pot B">Go to B</button>
+            </div>
+            <p class="t" id="waterTitle">Water source · Right side of pot B</p>
+            <p class="s">Pot B has a water reservoir behind a porous wall on one side; water seeps into the soil, so it is wetter near the reservoir and drier across the pot. Pot A gets the same water spread evenly, so it has no gradient.</p>
+            <div class="chip-row">
+              <button class="icon-act water-toggle active" id="waterBtn" role="switch" aria-checked="true" title="Turn water off" aria-label="Water source on">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M12 3.5c3.6 4.5 5.8 7.9 5.8 10.7a5.8 5.8 0 0 1-11.6 0c0-2.8 2.2-6.2 5.8-10.7Z"></path><path class="slash" d="M4.5 4.5l15 15" stroke-linecap="round"></path></svg>
+              </button>
+              <div class="seg" role="radiogroup" aria-label="Water source side" id="sideSeg">
+                <button role="radio" aria-checked="false" data-v="-1">Left</button>
+                <button role="radio" aria-checked="true" data-v="1">Right</button>
+              </div>
+            </div>
+            <div class="row">
+              <span class="swatch" aria-hidden="true"></span>
+              <input type="range" id="gradSlider" min="0" max="1" step="0.05" value="0.6" aria-label="Moisture gradient across the root, as a water potential difference" />
+              <span class="light-readout" id="gradReadout">Δψ 0.60 MPa</span>
+            </div>
+            <div class="legend-row"><span>No gradient</span><span>Steep gradient</span></div>
+            <div class="psi"><span>Wet side <b id="psiWet">−0.05 MPa</b></span><span>Dry side <b id="psiDry">−0.65 MPa</b></span></div>
+          </div>
+
+          <div class="narration-cards">
+    <div class="stat-card" style="--accent: rgba(160,164,172,0.6);">
+      <p class="label">Control root · A</p>
+      <p id="controlStat">0° · growing straight down</p>
+    </div>
+    <div class="stat-card" style="--accent: rgba(92,203,242,0.75);">
+      <p class="label">Experimental root · B</p>
+      <p id="experimentalStat">0° · lag phase, water on the right</p>
+    </div>
+  </div>
+
+  <section class="data-card" aria-labelledby="dataTitle">
+    <div class="data-head">
+      <h2 class="data-h"><button class="collapse-btn" id="dataToggle" aria-expanded="true" aria-controls="dataBody" title="Collapse chart">
+        <span id="dataTitle">Root tip angle over time <small>(+ right, − left)</small></span>
+        <svg class="mini-icon collapse-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
+      </button></h2>
+      <div class="seg small" role="radiogroup" aria-label="Chart view" id="viewSeg">
+        <button role="radio" aria-checked="true" data-v="bend">Bend</button>
+        <button role="radio" aria-checked="false" data-v="growth">Cortex growth</button>
+      </div>
+      <div class="seg small" role="radiogroup" aria-label="Plants per room" id="repSeg">
+        <button role="radio" aria-checked="true" data-v="1">1 plant</button>
+        <button role="radio" aria-checked="false" data-v="5">5 seedlings</button>
+      </div>
+    </div>
+    <div class="data-body" id="dataBody">
+    <div class="legend" id="legend"></div>
+    <canvas id="chart" role="img" aria-label="Line chart of root tip angle against time for plants A and B"></canvas>
+    <div class="data-actions" role="toolbar" aria-label="Readings">
+      <button class="icon-act primary" id="freezeBtn" title="Record reading" aria-label="Record reading">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3.6" fill="currentColor" stroke="none"></circle></svg>
+      </button>
+      <button class="icon-act" id="copyCsvBtn" title="Copy readings (CSV)" aria-label="Copy readings as CSV">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><rect x="8.5" y="8.5" width="11" height="12" rx="2.2"></rect><path d="M15.5 8.5V6a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"></path></svg>
+      </button>
+      <button class="icon-act" id="saveCsvBtn" title="Save readings (CSV)" aria-label="Save readings as CSV">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="11" rx="2"></rect><path d="M3.5 8h17M9.5 3.5v11"></path><path d="M12 15.5v5M9.5 18l2.5 2.5 2.5-2.5"></path></svg>
+      </button>
+      <button class="icon-act" id="savePngBtn" title="Save chart (PNG)" aria-label="Save chart as PNG image">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="13" rx="2"></rect><path d="m6.5 13.5 3.5-4 3 3 2-2 2.5 3"></path><path d="M12 17v4M9.8 19l2.2 2.2 2.2-2.2"></path></svg>
+      </button>
+      <button class="icon-act" id="clearBtn" title="Clear readings" aria-label="Clear readings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13M10.5 11v5.5M13.5 11v5.5"></path></svg>
+      </button>
+    </div>
+    <div class="reasoning" id="reasoning" aria-live="polite"></div>
+    <p class="data-note" id="dataNote" role="status"></p>
+    <div id="resultsWrap"><p class="results-empty">No readings yet. Pause at any time and tap the record button.</p></div>
+    </div>
+  </section>
+
+  <div class="info-card" id="mechanismCard" data-expanded="false">
+    <button class="info-card-header" id="mechanismCardToggle" aria-expanded="false" aria-controls="mechanismCardContent">
+      <span>Mechanism</span>
+      <svg class="mini-icon info-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
+    </button>
+    <div class="info-card-panel"><div class="info-card-panel-inner">
+      <div class="info-card-body" id="mechanismCardContent" role="region" aria-labelledby="mechanismCardToggle">
+          <p><strong>Positive hydrotropism</strong></p>
+          <p>Roots grow toward wetter soil. The root tip senses a difference in water potential (ψ) across its two flanks. In <i>Arabidopsis</i>, both sensing and the growth response happen in the elongation zone: the ABA-signalling kinase SnRK2.2 and the hydrotropism-specific protein MIZ1 act in cortex cells there, and the cortex on the drier flank elongates more, so the root curves toward the water (<a href="https://doi.org/10.1038/nplants.2017.57" target="_blank" rel="noopener">Dietrich et al., 2017</a>).</p>
+          <p>Cytokinin also builds up on the drier, lower-ψ side of the root tip, raising cell division there (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6951336/" target="_blank" rel="noopener">Chang et al., 2019</a>). Hydrotropism needs MIZ1 but works independently of the other tropisms (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC1810325" target="_blank" rel="noopener">Kobayashi et al., 2007</a>).</p>
+          <p><strong>How the model is set</strong></p>
+          <p>Lag phase: curvature starts within about 30 min of a moisture gradient (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC167020" target="_blank" rel="noopener">Takahashi et al., 2003</a>).</p>
+          <p>Gradient: roots curve away from agar holding 0.5–1.5 MPa of sorbitol and reach 80–100° within 24 h (<a href="https://doi.org/10.1007/s00425-002-0840-3" target="_blank" rel="noopener">Takahashi et al., 2002</a>). Here the response grows with Δψ up to 1 MPa.</p>
+          <p>Gravity: a moisture gradient breaks down the starch-filled amyloplasts in the root cap columella. Under a strong gradient they fall below 60% of normal within 30 min and to about 15% by 4 h (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC167020" target="_blank" rel="noopener">Takahashi et al., 2003</a>). The model follows this time course, scaled by the gradient, and weakens the gravitropic pull to match. Regrowth after the gradient is removed is slower (6 h, illustrative). Gravitropic correction follows the sine law, as in Phyto Helios.</p>
+          <p>Checks against the data: at Δψ 0.6 MPa the root reaches about 79° by 24 h, and at 1.0 MPa about 88°, within the 80–100° reported for sorbitol split agar. At 1.0 MPa the root turns up to about 13° per hour, close to the 4–8 h needed to pass 90° under a steep humidity gradient.</p>
+          <p>Cortex growth: a root of diameter d that turns at ω (radians per hour) needs one flank to elongate ω·d faster than the other. Each flank therefore differs from the mean rate v by ±ω·d/2v. With d = 120 µm and v = 0.2 mm h⁻¹ (an <i>Arabidopsis</i> primary root) this is about ±4% at the peak, which the Cortex growth chart shows.</p>
+          <p>Magnifier: the lens shows the “Root Structure” model, a cut-away root tip, bent to the model's tip angle. The bend is a true arc in the elongation zone, so the outer, drier flank is longer than the inner one, while the meristem and root cap stay straight and turn with the tip. Teal marks MIZ1/SnRK2.2 activity in the elongation-zone cortex on the drier flank, and the root cap shows its remaining amyloplasts.</p>
+          <p>The 120 h (5-day) timeline compresses root growth for display. The timing follows the figures above; the root system's size and the response constants are illustrative.</p>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="info-card" id="creditsCard" data-expanded="false">
+    <button class="info-card-header" id="creditsCardToggle" aria-expanded="false" aria-controls="creditsCardContent">
+      <span>Credits</span>
+      <svg class="mini-icon info-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
+    </button>
+    <div class="info-card-panel"><div class="info-card-panel-inner">
+      <div class="info-card-body" id="creditsCardContent" role="region" aria-labelledby="creditsCardToggle">
+          <p>“<a href="https://skfb.ly/oY7EL" target="_blank" rel="noopener">Avocady</a>” by Wenschel, licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+          <p>“<a href="https://sketchfab.com/3d-models/3d-corn-root-x-rat-ct-scan-at-resolution-113um-045eb96fb8fc4fb688ffd19709ab9b75" target="_blank" rel="noopener">3D Corn root X Rat CT scan at resolution 113um</a>” by nate.ellis8, licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+          <p>“<a href="https://skfb.ly/6WSTs" target="_blank" rel="noopener">Water Animation</a>” by Artise1, licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+          <p>“<a href="https://skfb.ly/oyYpS" target="_blank" rel="noopener">Styled Magnifying Glass</a>” by Incg5764, licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+          <p>“Root Structure” by arloopa, licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>; shown as the root tip inside the magnifier.</p>
+          <p>“<a href="https://skfb.ly/6Txsn" target="_blank" rel="noopener">pot</a>” by vivikeram, licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+          <p>Changes: all models were optimised for the web (geometry simplified). The avocado's pot and soil were removed; the pot model is rendered as clear glass with an outline, with translucent soil inside. The Root Structure model's baked text labels were removed and replaced by live labels, and its green tissues recoloured to root cream. The water animation's texture was replaced by a water material, and the surface is trimmed to the reservoir in pot B. The corn root scan was recoloured, scaled for growth and is deformed at runtime to show the hydrotropic bend.</p>
+      </div>
+    </div></div>
+  </div>
+
+  </div>
+  </div>
+</div>
+
+
+<script type="importmap">
+{ "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
