@@ -145,7 +145,7 @@ All models were optimised for the web (geometry simplified, textures resized or 
 
 | Release | Title | Date |
 |---|---|---|
-| RC I | Phyto Poseidon | 27 Nov 2026 |
+| RC I | Riverine | 27 Nov 2026 |
 
 ## License
 
